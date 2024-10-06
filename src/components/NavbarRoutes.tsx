@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
+import { UserButton } from "@clerk/nextjs";
 
 const NavbarRoutes = () => {
   const pathname = usePathname();
@@ -24,7 +25,9 @@ const NavbarRoutes = () => {
       )}
 
       {/* user button */}
-      <div className="">Hey, user</div>
+      <Button size={"sm"} asChild>
+        <UserButton />
+      </Button>
     </div>
   );
 };

@@ -9,7 +9,7 @@ const Sidebar = () => {
     {
       label: "Dashboard",
       icon: LayoutDashboard,
-      path: "/dashboard",
+      path: "/",
     },
     {
       label: "Browse",
