@@ -1,21 +1,24 @@
 "use client";
-import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut } from "lucide-react";
+
 import { Button } from "./ui/button";
-import { UserButton } from "@clerk/nextjs";
 
 const NavbarRoutes = () => {
   const pathname = usePathname();
 
   const isTeacherMode = pathname?.includes("/teacher");
   const isPlayerMode = pathname?.includes("/chapter");
+
+  const isOnTheBrowsePage = pathname.includes("/browse");
   return (
-    <div className="px-4 flex ml-auto">
+    <div className="px-4 flex gap-2 ml-auto">
       {isTeacherMode || isPlayerMode ? (
         <Link href={"/"}>
           <Button variant={"ghost"}>
-            <LogOut />
+            Exit
+            <LogOut className="ml-2" size={"1rem"} />
           </Button>
         </Link>
       ) : (
@@ -25,9 +28,6 @@ const NavbarRoutes = () => {
       )}
 
       {/* user button */}
-      <Button size={"sm"} asChild>
-        <UserButton />
-      </Button>
     </div>
   );
 };

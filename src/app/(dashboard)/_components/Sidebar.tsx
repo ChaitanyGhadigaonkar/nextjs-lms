@@ -2,9 +2,25 @@
 import Link from "next/link";
 import Logo from "./Logo";
 import SidebarLinks from "./SidebarLinks";
-import { Globe, LayoutDashboard } from "lucide-react";
+import { BarChart, Compass, LayoutDashboard, List } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
+  const pathname = usePathname();
+
+  const isTeacherRoute = pathname?.includes("/teacher");
+  const teacherRoutes = [
+    {
+      label: "Courses",
+      icon: List,
+      path: "/teacher/courses",
+    },
+    {
+      label: "Analytics",
+      icon: BarChart,
+      path: "/teacher/analytics",
+    },
+  ];
   const guestRoutes = [
     {
       label: "Dashboard",
@@ -13,10 +29,13 @@ const Sidebar = () => {
     },
     {
       label: "Browse",
-      icon: Globe,
+      icon: Compass,
       path: "/browse",
     },
   ];
+
+  const routes = isTeacherRoute ? teacherRoutes : guestRoutes;
+
   return (
     <>
       <div className="w-full flex py-4 h-[80px]">
@@ -26,7 +45,7 @@ const Sidebar = () => {
       </div>
       {/* links */}
       <div className="flex flex-col w-full">
-        {guestRoutes.map((route) => (
+        {routes.map((route) => (
           <SidebarLinks
             key={route.path}
             icon={route.icon}

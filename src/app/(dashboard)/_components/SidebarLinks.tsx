@@ -20,12 +20,13 @@ const SidebarLinks = ({ label, icon: Icon, path }: SidebarLinksProps) => {
   return (
     <button
       className={cn(
-        "flex items-center gap-x-2 py-2 text-slate-500 text-sm font-[500] pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20 md:text-base",
+        "flex items-center gap-x-2 py-4 text-slate-500 text-sm font-[500] pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20 md:text-base",
         isActive &&
           "text-sky-700 bg-sky-200/20 hover:bg-sky-200/20 border-r-2 border-blue-700"
       )}
       onClick={onClick}
     >
+      <Icon className="mr-2" />
       {label}
     </button>
   );
