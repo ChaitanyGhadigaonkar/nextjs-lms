@@ -15,8 +15,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CreateCourseSchema from "@/app/schema/CreateCourseSchema";
+import { useRouter } from "next/navigation";
 
 const CreateCourseForm = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof CreateCourseSchema>>({
     resolver: zodResolver(CreateCourseSchema),
     defaultValues: {
@@ -25,7 +27,8 @@ const CreateCourseForm = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof CreateCourseSchema>) => {
-    console.log(values);
+    // this must be course id where we should navigate
+    router.push(`/teacher/courses/${values.name}`);
   };
   return (
     // <FormProvider {...form}>

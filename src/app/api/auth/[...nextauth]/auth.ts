@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 
 import db from "@/db/db";
 
+// TODO: Implement Email Password Authentication using Next Js
+
 const authOptions: AuthOptions = {
   providers: [
     Github({
