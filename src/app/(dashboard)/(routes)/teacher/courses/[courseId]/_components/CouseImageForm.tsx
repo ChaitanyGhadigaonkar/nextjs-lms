@@ -1,39 +1,13 @@
 "use client";
 import { useState } from "react";
 import { Pencil } from "lucide-react";
-import { useForm } from "react-hook-form";
 import Image from "next/image";
 
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-
-const titleFormSchema = z.object({
-  title: z.string().min(3, "title must be at least 3 character long."),
-});
+import UploadFile from "@/components/UploadFile";
 
 const CourseImageForm = () => {
   const [isEditing, setIsEditing] = useState(false);
-
-  const form = useForm<z.infer<typeof titleFormSchema>>({
-    resolver: zodResolver(titleFormSchema),
-    defaultValues: {
-      title: "",
-    },
-  });
-
-  const handleSubmit = (values: z.infer<typeof titleFormSchema>) => {
-    console.log(values);
-  };
 
   const toggleEditing = () => {
     setIsEditing((prev) => !prev);
@@ -72,26 +46,12 @@ const CourseImageForm = () => {
         />
       )}
       {isEditing && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4 py-2"
-          >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input placeholder="e.g, Web Development" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">save</Button>
-          </form>
-        </Form>
+        <UploadFile
+          accept="video/*"
+          onFileUpload={() => {
+            setIsEditing(false);
+          }}
+        />
       )}
     </div>
   );
