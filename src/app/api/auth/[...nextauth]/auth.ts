@@ -15,9 +15,9 @@ const authOptions: AuthOptions = {
       profile: (profile, tokens) => {
         return {
           id: profile.id,
-          name: profile.display_name,
+          name: profile.name,
           email: profile.email,
-          image: profile.images?.[0]?.url,
+          image: profile.avatar_url,
         };
       },
     }),
@@ -67,6 +67,26 @@ const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async signIn({ account, user }) {
+      if (account?.provider === "github") {
+        const existingUser = await db.user.findUnique({
+          where: { email: user.email! },
+        });
+        if (!existingUser) {
+          await db.user.create({
+            data: {
+              email: user.email!,
+              name: user.name,
+              image: user.image,
+              // githubId: user.id,
+            },
+          });
+        }
+      }
+      return true;
+    },
   },
 };
 

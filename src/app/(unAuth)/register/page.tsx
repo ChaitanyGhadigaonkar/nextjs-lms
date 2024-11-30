@@ -1,5 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Github } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
+import Image from "next/image";
+import Link from "next/link";
+import { z } from "zod";
 import {
   FormControl,
   FormField,
@@ -8,25 +13,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Github } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
 import LoginPageImage from "@/assets/LoginPageImage.jpg";
 import registerAction from "@/actions/auth/RegisterAction";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { signIn } from "next-auth/react";
+
+const registerSchema = z.object({
+  name: z.string().min(3, "name should be min 3 characters long"),
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(8, "password should be 8 character long"),
+});
 
 const Register = () => {
   const router = useRouter();
   const { toast } = useToast();
-  const registerSchema = z.object({
-    name: z.string().min(3, "name should be min 3 characters long"),
-    email: z.string().email("Enter a valid email"),
-    password: z.string().min(8, "password should be 8 character long"),
-  });
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -44,7 +46,6 @@ const Register = () => {
     formData.append("password", values.password);
 
     const { success, message } = await registerAction(formData);
-    console.log(message);
     if (success) {
       toast({
         description: message,
@@ -59,6 +60,7 @@ const Register = () => {
       });
     }
   };
+
   return (
     <div className="w-[90%] h-full md:h-[32rem] flex p-2 md:p-8 ">
       <div className="left flex-1 flex items-center justify-center">
@@ -71,7 +73,14 @@ const Register = () => {
               Learning Management System
             </h3>
 
-            <Button className="flex items-center mx-auto gap-2 mt-4 px-6 py-4">
+            <Button
+              className="flex items-center mx-auto gap-2 mt-4 px-6 py-4"
+              onClick={() => {
+                signIn("github", {
+                  callbackUrl: "/",
+                });
+              }}
+            >
               <Github className="text-sm font-medium font-mono" />
               <p className="text-snm font-medium font-mono">
                 Sign Up With Github

@@ -7,10 +7,9 @@ const Dashboard = () => {
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
-      redirect("/api/auth/signin?callbackUrl=/client");
+      redirect("/login");
     },
   });
-  console.log(session);
   return <div>Dashboard</div>;
 };
 

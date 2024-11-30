@@ -15,6 +15,7 @@ import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import LoginPageImage from "@/assets/LoginPageImage.jpg";
+import { signIn } from "next-auth/react";
 
 const Login = () => {
   const loginSchema = z.object({
@@ -30,8 +31,14 @@ const Login = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values);
+  const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
+    await signIn("with-email-password", {
+      // it will be with-email-password not credentials
+      email: values.email,
+      password: values.password,
+      // redirect: false,
+      callbackUrl: "/",
+    });
   };
   return (
     <div className="w-[90%] h-full md:h-[32rem] flex p-2 md:p-8 ">
@@ -45,7 +52,14 @@ const Login = () => {
               Learning Management System
             </h3>
 
-            <Button className="flex items-center mx-auto gap-2 mt-4 px-6 py-4">
+            <Button
+              className="flex items-center mx-auto gap-2 mt-4 px-6 py-4"
+              onClick={() => {
+                signIn("github", {
+                  callbackUrl: "/",
+                });
+              }}
+            >
               <Github className="text-sm font-medium font-mono" />
               <p className="text-snm font-medium font-mono">
                 Login With Github
