@@ -15,23 +15,49 @@ import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import LoginPageImage from "@/assets/LoginPageImage.jpg";
+import registerAction from "@/actions/auth/RegisterAction";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
-const Login = () => {
-  const loginSchema = z.object({
+const Register = () => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const registerSchema = z.object({
+    name: z.string().min(3, "name should be min 3 characters long"),
     email: z.string().email("Enter a valid email"),
     password: z.string().min(8, "password should be 8 character long"),
   });
 
-  const loginForm = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values);
+  const handleSubmit = async (values: z.infer<typeof registerSchema>) => {
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("name", values.name);
+    formData.append("password", values.password);
+
+    const { success, message } = await registerAction(formData);
+    console.log(message);
+    if (success) {
+      toast({
+        description: message,
+      });
+      router.push("/browse");
+    } else {
+      toast({
+        description: "User with email already exists.",
+      });
+      registerForm.setError("root", {
+        message: message,
+      });
+    }
   };
   return (
     <div className="w-[90%] h-full md:h-[32rem] flex p-2 md:p-8 ">
@@ -39,7 +65,7 @@ const Login = () => {
         <div className="flex flex-col gap-4">
           <div className="top">
             <p className="text-sm text-slate-600 font-semibold text-center">
-              Log in to
+              Create New Account
             </p>
             <h3 className="text-xl font-semibold text-slate-950 text-center ">
               Learning Management System
@@ -48,7 +74,7 @@ const Login = () => {
             <Button className="flex items-center mx-auto gap-2 mt-4 px-6 py-4">
               <Github className="text-sm font-medium font-mono" />
               <p className="text-snm font-medium font-mono">
-                Login With Github
+                Sign Up With Github
               </p>
             </Button>
           </div>
@@ -60,14 +86,27 @@ const Login = () => {
           </div>
 
           <div>
-            <FormProvider {...loginForm}>
+            <FormProvider {...registerForm}>
               <form
-                onSubmit={loginForm.handleSubmit(handleSubmit)}
+                onSubmit={registerForm.handleSubmit(handleSubmit)}
                 className="flex flex-col gap-4 justify-center"
               >
                 <FormField
+                  name="name"
+                  control={registerForm.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enter Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
                   name="email"
-                  control={loginForm.control}
+                  control={registerForm.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Enter Email</FormLabel>
@@ -80,7 +119,7 @@ const Login = () => {
                 />
                 <FormField
                   name="password"
-                  control={loginForm.control}
+                  control={registerForm.control}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Enter Password</FormLabel>
@@ -96,7 +135,7 @@ const Login = () => {
                   )}
                 />
                 <Button type="submit" className="mx-auto">
-                  Log in
+                  Sign Up
                 </Button>
               </form>
             </FormProvider>
@@ -104,9 +143,9 @@ const Login = () => {
 
           <div className="">
             <p className="text-base text-slate-600 text-center">
-              Don't have an account ?{" "}
-              <Link href={"/register"} className="font-semibold text-slate-900">
-                Sign up
+              Already have an account ?{" "}
+              <Link href={"/login"} className="font-semibold text-slate-900">
+                login
               </Link>
             </p>
           </div>
@@ -127,4 +166,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

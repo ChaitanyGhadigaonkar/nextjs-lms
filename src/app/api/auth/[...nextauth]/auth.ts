@@ -24,17 +24,6 @@ const authOptions: AuthOptions = {
     Credentials({
       id: "with-email-password",
       name: "Email and Password",
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null;
-        }
-        const user = {
-          email: credentials.email,
-          password: credentials.password,
-          id: "",
-        };
-        return user;
-      },
       credentials: {
         email: {
           label: "Email",
@@ -47,8 +36,38 @@ const authOptions: AuthOptions = {
           placeholder: "Enter Password",
         },
       },
+      async authorize(credentials) {
+        const isExists = await db.user.findFirst({
+          where: {
+            email: credentials?.email,
+          },
+        });
+
+        if (!isExists) {
+          return null;
+        }
+
+        const isMatched = await bcrypt.compare(
+          credentials?.password as string,
+          isExists?.password as string
+        );
+
+        if (!isMatched) {
+          return null;
+        }
+        const user = {
+          email: isExists.email,
+          name: isExists.name,
+          id: isExists.id,
+          image: isExists.image,
+        };
+        return user;
+      },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
 };
 
 const getSession = () => getServerSession(authOptions);

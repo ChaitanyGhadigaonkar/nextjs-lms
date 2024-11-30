@@ -1,11 +1,3 @@
-import { NextRequest, NextResponse } from "next/server";
+export { default } from "next-auth/middleware";
 
-export function middleware(req: NextRequest) {
-  const skipMiddlewareRoutes = ["/api/upload"];
-
-  if (skipMiddlewareRoutes.includes(req.nextUrl.pathname)) {
-    return NextResponse.next();
-  }
-
-  return NextResponse.next();
-}
+export const config = { matcher: ["/login", "/register"] };

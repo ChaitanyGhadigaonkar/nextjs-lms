@@ -1,13 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, LogOutIcon } from "lucide-react";
 
 import { Button } from "./ui/button";
+import { signOut, useSession } from "next-auth/react";
 
 const NavbarRoutes = () => {
   const pathname = usePathname();
-
+  const session = useSession();
+  console.log(session);
   const isTeacherMode = pathname?.includes("/teacher");
   const isPlayerMode = pathname?.includes("/chapter");
 
@@ -28,6 +30,17 @@ const NavbarRoutes = () => {
       )}
 
       {/* user button */}
+      {session?.data && (
+        <Button
+          onClick={() => {
+            signOut();
+          }}
+          className="text-sm flex items-center gap-2 py-2 px-4"
+        >
+          <LogOutIcon className="size-5" />
+          LogOut
+        </Button>
+      )}
     </div>
   );
 };

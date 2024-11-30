@@ -7,19 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// role
-enum Role {
-  Student
-  Teacher
-}
-
 model User {
   id        String   @id @default(uuid())
   name      String?
   email     String   @unique
   image     String?
   password  String?
-  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Course    Course?
