@@ -1,5 +1,16 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
+import { z } from "zod";
+import LoginPageImage from "@/assets/LoginPageImage.jpg";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Github } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
+
 import {
   FormControl,
   FormField,
@@ -7,22 +18,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Github } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
-import LoginPageImage from "@/assets/LoginPageImage.jpg";
-import { signIn } from "next-auth/react";
+
+const loginSchema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(8, "password should be 8 character long"),
+});
 
 const Login = () => {
-  const loginSchema = z.object({
-    email: z.string().email("Enter a valid email"),
-    password: z.string().min(8, "password should be 8 character long"),
-  });
-
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -33,7 +35,6 @@ const Login = () => {
 
   const handleSubmit = async (values: z.infer<typeof loginSchema>) => {
     await signIn("with-email-password", {
-      // it will be with-email-password not credentials
       email: values.email,
       password: values.password,
       // redirect: false,

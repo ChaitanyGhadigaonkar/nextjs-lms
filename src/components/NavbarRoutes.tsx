@@ -5,11 +5,11 @@ import { LogOut, LogOutIcon } from "lucide-react";
 
 import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
+import UserButton from "./UserButton";
 
 const NavbarRoutes = () => {
   const pathname = usePathname();
   const session = useSession();
-  console.log(session);
   const isTeacherMode = pathname?.includes("/teacher");
   const isPlayerMode = pathname?.includes("/chapter");
 
@@ -30,17 +30,7 @@ const NavbarRoutes = () => {
       )}
 
       {/* user button */}
-      {session?.data && (
-        <Button
-          onClick={() => {
-            signOut();
-          }}
-          className="text-sm flex items-center gap-2 py-2 px-4"
-        >
-          <LogOutIcon className="size-5" />
-          LogOut
-        </Button>
-      )}
+      {session?.data && <UserButton />}
     </div>
   );
 };
