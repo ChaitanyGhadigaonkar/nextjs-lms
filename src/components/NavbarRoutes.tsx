@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { LogOut, LogOutIcon } from "lucide-react";
 
 import { Button } from "./ui/button";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import UserButton from "./UserButton";
 
 const NavbarRoutes = () => {

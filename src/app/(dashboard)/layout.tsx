@@ -5,7 +5,7 @@ import Sidebar from "./_components/Sidebar";
 const layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <AuthProvider>
-      <div className="w-full h-full flex-1 flex border border-red-900">
+      <div className="w-full h-full flex-1 flex border">
         <div
           className="
         hidden md:flex md:w-60 fixed inset-y-0 border-r border-slate-100 flex-col z-50
