@@ -12,7 +12,6 @@ const NavbarRoutes = () => {
   const session = useSession();
   const isTeacherMode = pathname?.includes("/teacher");
   const isPlayerMode = pathname?.includes("/chapter");
-
   const isOnTheBrowsePage = pathname.includes("/browse");
   return (
     <div className="px-4 flex gap-2 ml-auto">

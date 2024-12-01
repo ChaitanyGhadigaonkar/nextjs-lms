@@ -80,12 +80,22 @@ const authOptions: AuthOptions = {
               email: user.email!,
               name: user.name,
               image: user.image,
-              // githubId: user.id,
             },
           });
         }
       }
       return true;
+    },
+    async session({ session, user, token }) {
+      if (session?.user) {
+        const userData = await db.user.findFirst({
+          where: {
+            email: user?.email,
+          },
+        });
+        session.user.id = userData?.id as string;
+      }
+      return session;
     },
   },
 };
