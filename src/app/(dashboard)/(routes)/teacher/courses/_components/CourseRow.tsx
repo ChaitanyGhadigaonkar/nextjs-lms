@@ -1,4 +1,7 @@
+"use client";
+import { DeleteCourseAction } from "@/actions/teacherAction";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Decimal } from "@prisma/client/runtime/library";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const CourseRow = ({
   course,
@@ -23,6 +27,7 @@ const CourseRow = ({
     creatorId: string;
   };
 }) => {
+  const router = useRouter();
   return (
     <TableRow>
       <TableCell className="text-ellipsis w-10 md:w-auto overflow-hidden md:text-left md:pl-4 font-medium">
@@ -44,9 +49,29 @@ const CourseRow = ({
             <Ellipsis />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Edit</DropdownMenuLabel>
-            <DropdownMenuLabel>Delete</DropdownMenuLabel>
+          <DropdownMenuContent className="flex flex-col items-center justify-center">
+            <DropdownMenuLabel>
+              <Button
+                className="w-20"
+                onClick={() => {
+                  router.push(`/teacher/courses/${course.courseId}`);
+                }}
+              >
+                Edit
+              </Button>
+            </DropdownMenuLabel>
+            <DropdownMenuLabel>
+              <Button
+                variant={"destructive"}
+                className="w-20"
+                onClick={async () => {
+                  await DeleteCourseAction(course.courseId);
+                  router.refresh();
+                }}
+              >
+                Delete
+              </Button>
+            </DropdownMenuLabel>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
