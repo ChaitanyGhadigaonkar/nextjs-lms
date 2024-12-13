@@ -12,6 +12,11 @@ const nextConfig = {
         hostname: "avatars.githubusercontent.com",
         port: "",
       },
+      {
+        protocol: "http",
+        hostname: "res.cloudinary.com",
+        port: "",
+      },
     ],
   },
 };

@@ -5,9 +5,20 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import UploadFile from "@/components/UploadFile";
+import { useParams, useRouter } from "next/navigation";
+import { UpdateCourseImageAction } from "@/actions/teacherAction";
+import { useToast } from "@/hooks/use-toast";
 
-const CourseImageForm = () => {
+type CourseImageFormType = {
+  image: string | null | undefined;
+};
+const CourseImageForm = ({ image }: CourseImageFormType) => {
+  const router = useRouter();
+  const params = useParams();
+  const toast = useToast();
+
   const [isEditing, setIsEditing] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   const toggleEditing = () => {
     setIsEditing((prev) => !prev);
@@ -36,9 +47,12 @@ const CourseImageForm = () => {
 
       {!isEditing && (
         <Image
+          priority={true}
           className="text-base py-2 w-full h-56 rounded-lg"
           src={
-            "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg"
+            image
+              ? image
+              : "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg"
           }
           width={300}
           height={250}
@@ -47,8 +61,23 @@ const CourseImageForm = () => {
       )}
       {isEditing && (
         <UploadFile
-          accept="video/*"
-          onFileUpload={() => {
+          accept="image/*"
+          setUploadedFileUrl={setImageUrl}
+          onFileUpload={async (image) => {
+            const data = await UpdateCourseImageAction(
+              params.courseId as string,
+              image
+            );
+            if (data.success) {
+              toast.toast({
+                description: "Course Updated Succesfully.",
+              });
+            } else {
+              toast.toast({
+                description: "Failed  To update Course Image",
+              });
+            }
+            router.refresh();
             setIsEditing(false);
           }}
         />

@@ -8,17 +8,21 @@ import CourseTitleForm from "./CourseTitleForm";
 import CourseDescriptionForm from "./CourseDescriptionForm";
 import CourseImageForm from "./CouseImageForm";
 import CategorySelection from "./CategorySelection";
+import { Course } from "@prisma/client";
 
-const CourseDetailsLeft = () => {
+interface CourseDetailsLeftProps {
+  course: Course | null;
+}
+const CourseDetailsLeft = ({ course }: CourseDetailsLeftProps) => {
   return (
     <div className="flex flex-col ">
       <SectionHeader title="Customize your course" icon={LayoutDashboard} />
       <div className="flex flex-col">
         {/* title */}
 
-        <CourseTitleForm />
-        <CourseDescriptionForm />
-        <CourseImageForm />
+        <CourseTitleForm title={course?.title} />
+        <CourseDescriptionForm description={course?.description} />
+        <CourseImageForm image={course?.image} />
         <CategorySelection />
       </div>
     </div>

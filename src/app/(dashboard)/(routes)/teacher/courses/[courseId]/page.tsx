@@ -1,13 +1,21 @@
-"use client";
 import { LayoutDashboard, ListChecks, Trash } from "lucide-react";
-import { useParams } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
+import db from "@/db/db";
+
 import SectionHeader from "../../_components/SectionHeader";
 import CourseDetailsLeft from "./_components/CourseDetailsLeft";
 
-const CourseOverViewPage = () => {
-  const params = useParams();
+const CourseOverViewPage = async ({
+  params,
+}: {
+  params: { courseId: string };
+}) => {
+  const courseDetails = await db.course.findFirst({
+    where: {
+      courseId: params.courseId as string,
+    },
+  });
+
   return (
     <div className="flex flex-col">
       <div className="flex gap-2 items-center md:flex-row md:justify-between">
@@ -30,7 +38,7 @@ const CourseOverViewPage = () => {
       <div className="flex-1 flex my-4 flex-col gap-2 md:flex-row">
         {/* left */}
         <div className="flex flex-1 flex-col gap-2">
-          <CourseDetailsLeft />
+          <CourseDetailsLeft course={courseDetails} />
         </div>
         {/* right  */}
         <div className="flex-1">

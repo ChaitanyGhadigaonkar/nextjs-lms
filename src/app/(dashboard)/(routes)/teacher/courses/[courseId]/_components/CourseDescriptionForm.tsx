@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Loader2, Pencil } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod";
@@ -15,23 +15,50 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { UpdateCourseDescriptionAction } from "@/actions/teacherAction";
+import { useParams, useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
-const titleFormSchema = z.object({
-  title: z.string().min(3, "title must be at least 3 character long."),
+const descriptionFormSchema = z.object({
+  description: z.string().max(100, "title must be at least 50 character long."),
 });
+type CourseDescriptionFormProps = {
+  description: string | null | undefined;
+};
 
-const CourseDescriptionForm = () => {
+const CourseDescriptionForm = ({ description }: CourseDescriptionFormProps) => {
+  const router = useRouter();
+  const params = useParams();
+  const toast = useToast();
+
   const [isEditing, setIsEditing] = useState(false);
+  const [isPending, setTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof titleFormSchema>>({
-    resolver: zodResolver(titleFormSchema),
+  const form = useForm<z.infer<typeof descriptionFormSchema>>({
+    resolver: zodResolver(descriptionFormSchema),
     defaultValues: {
-      title: "",
+      description: "",
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof titleFormSchema>) => {
-    console.log(values);
+  const handleSubmit = (values: z.infer<typeof descriptionFormSchema>) => {
+    setTransition(async () => {
+      const res = await UpdateCourseDescriptionAction(
+        params.courseId as string,
+        values.description
+      );
+      if (res.success) {
+        toast.toast({
+          description: "Course Updated Successfully.",
+        });
+      } else {
+        toast.toast({
+          description: res.message,
+        });
+      }
+      setIsEditing(false);
+      router.refresh();
+    });
   };
 
   const toggleEditing = () => {
@@ -59,7 +86,15 @@ const CourseDescriptionForm = () => {
         </Button>
       </div>
 
-      {!isEditing && <p className="text-base py-2">No Description</p>}
+      {!isEditing && (
+        <p className="text-base py-2">
+          {!description ? (
+            <span className="text-sm font-medium">No Description</span>
+          ) : (
+            description
+          )}
+        </p>
+      )}
       {isEditing && (
         <Form {...form}>
           <form
@@ -68,7 +103,7 @@ const CourseDescriptionForm = () => {
           >
             <FormField
               control={form.control}
-              name="title"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -82,7 +117,14 @@ const CourseDescriptionForm = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">save</Button>
+            <Button type="submit">
+              {" "}
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "save"
+              )}
+            </Button>
           </form>
         </Form>
       )}

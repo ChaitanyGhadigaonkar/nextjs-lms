@@ -1,7 +1,7 @@
 "use client";
 import { uploadFileMutation } from "@/actions/uploadFileAction";
 import { Download } from "lucide-react";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 
 interface FileUploadError {
   message: string;
@@ -9,10 +9,15 @@ interface FileUploadError {
 
 interface ImageUploadProps {
   accept: string;
-  onFileUpload: () => void;
+  onFileUpload: (image: string) => void;
+  setUploadedFileUrl: Dispatch<SetStateAction<string>>;
 }
 
-const UploadFile = ({ accept, onFileUpload }: ImageUploadProps) => {
+const UploadFile = ({
+  accept,
+  onFileUpload,
+  setUploadedFileUrl,
+}: ImageUploadProps) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -65,9 +70,12 @@ const UploadFile = ({ accept, onFileUpload }: ImageUploadProps) => {
               }
             }
             const data = await uploadFileMutation(formData);
-            onFileUpload();
+            setUploadedFileUrl(data.result.result.url);
+            onFileUpload(data.result.result.url);
             setIsUploading(false);
           } else {
+            setUploadedFileUrl("");
+            setIsUploading(false);
           }
         }}
       />

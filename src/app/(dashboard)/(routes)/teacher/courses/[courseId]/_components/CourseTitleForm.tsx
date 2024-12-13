@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useParams } from "next/navigation";
+import { Loader2, Pencil } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,23 +18,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { UpdateCourseTitleAction } from "@/actions/teacherAction";
+import { useToast } from "@/hooks/use-toast";
 
 const titleFormSchema = z.object({
   title: z.string().min(3, "title must be at least 3 character long."),
 });
 
-const CourseTitleForm = () => {
+type CourseTitleFormType = {
+  title: string | undefined;
+};
+
+const CourseTitleForm = ({ title }: CourseTitleFormType) => {
+  const params = useParams();
+  const router = useRouter();
+  const toast = useToast();
+
   const [isEditing, setIsEditing] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof titleFormSchema>>({
     resolver: zodResolver(titleFormSchema),
     defaultValues: {
-      title: "",
+      title: title ? title : "",
     },
   });
 
   const handleSubmit = (values: z.infer<typeof titleFormSchema>) => {
-    console.log(values);
+    startTransition(async () => {
+      const res = await UpdateCourseTitleAction(
+        params.courseId as string,
+        values.title
+      );
+      if (res.success) {
+        toast.toast({
+          description: "Course Updated Successfully.",
+        });
+      } else {
+        toast.toast({
+          description: "Failed to update course title.",
+        });
+      }
+
+      setIsEditing(false);
+      router.refresh();
+    });
   };
 
   const toggleEditing = () => {
@@ -60,7 +90,7 @@ const CourseTitleForm = () => {
         </Button>
       </div>
 
-      {!isEditing && <p className="text-base py-2">Technology</p>}
+      {!isEditing && <p className="text-base py-2">{title}</p>}
       {isEditing && (
         <Form {...form}>
           <form
@@ -79,7 +109,13 @@ const CourseTitleForm = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">save</Button>
+            <Button type="submit">
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "save"
+              )}
+            </Button>
           </form>
         </Form>
       )}
