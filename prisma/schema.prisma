@@ -28,6 +28,7 @@ model Course {
   attachments  Attachment[]
   chapters     Chapter[]
   attachmentId String?      @unique
+  category     String?
   creatorId    String
   creator      User         @relation(fields: [creatorId], references: [id])
 }

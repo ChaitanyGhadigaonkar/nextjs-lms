@@ -1,11 +1,14 @@
 "use client";
-import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Loader2, Pencil } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useParams, useRouter } from "next/navigation";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { UpdateCourseCategoryAction } from "@/actions/teacherAction";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,14 +25,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CATEGORIES } from "@/lib/constants";
 
 const categoryFormSchema = z.object({
-  category: z.enum(["technology", "web development", "app development"], {
-    message: "please select a category",
-  }),
+  category: z.enum(
+    [
+      "accounting",
+      "computer science",
+      "engineering",
+      "filming",
+      "fitness",
+      "music",
+      "photography",
+    ],
+    {
+      message: "please select a category",
+    }
+  ),
 });
+type CategorySelectionType = {
+  category: string | null | undefined;
+};
+const CategorySelection = ({ category }: CategorySelectionType) => {
+  const router = useRouter();
+  const params = useParams();
+  const toast = useToast();
 
-const CategorySelection = () => {
+  const [isPending, setTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
 
   const form = useForm<z.infer<typeof categoryFormSchema>>({
@@ -37,7 +59,23 @@ const CategorySelection = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof categoryFormSchema>) => {
-    console.log(values);
+    setTransition(async () => {
+      const res = await UpdateCourseCategoryAction(
+        params.courseId as string,
+        values.category
+      );
+      if (res.success) {
+        toast.toast({
+          description: "Course Update Successfully.",
+        });
+      } else {
+        toast.toast({
+          description: res.message,
+        });
+      }
+      setIsEditing(false);
+      router.refresh();
+    });
   };
 
   const toggleEditing = () => {
@@ -47,7 +85,7 @@ const CategorySelection = () => {
   return (
     <div className="w-full flex flex-col gap-2 bg-blue-50 px-4 py-2 my-2 rounded-md md:gap-4">
       <div className="w-full flex items-center justify-between">
-        <h4 className="text-base font-medium ">Course Title</h4>
+        <h4 className="text-base font-medium ">Course Category</h4>
 
         <Button
           variant={"ghost"}
@@ -65,7 +103,9 @@ const CategorySelection = () => {
         </Button>
       </div>
 
-      {!isEditing && <p className="text-base py-2">Technology</p>}
+      {!isEditing && (
+        <p className="text-base py-2">{category ? category : "No category"}</p>
+      )}
       {isEditing && (
         <Form {...form}>
           <form
@@ -87,20 +127,24 @@ const CategorySelection = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="technology">technology</SelectItem>
-                      <SelectItem value="web development">
-                        web development
-                      </SelectItem>
-                      <SelectItem value="app development">
-                        app development
-                      </SelectItem>
+                      {CATEGORIES.map((item) => (
+                        <SelectItem value={item.key} key={item.key}>
+                          {item.value}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">save</Button>
+            <Button type="submit">
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "save"
+              )}
+            </Button>
           </form>
         </Form>
       )}

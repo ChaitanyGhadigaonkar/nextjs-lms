@@ -130,13 +130,41 @@ export const UpdateCourseImageAction = async (
     if (!session?.user?.email) {
       throw new Error("Session Not Found");
     }
-
     const updatedCourse = await db.course.update({
       where: {
         courseId,
       },
       data: {
         image,
+      },
+    });
+    return {
+      success: true,
+      data: { updatedCourse },
+      message: "Course updated Successfully",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Failed To Create Course." };
+  }
+};
+export const UpdateCourseCategoryAction = async (
+  courseId: string,
+  category: string
+) => {
+  try {
+    const session = await getSession();
+    if (!session?.user?.email) {
+      throw new Error("Session Not Found");
+    }
+    const updatedCourse = await db.course.update({
+      where: {
+        courseId,
+      },
+      data: {
+        category,
       },
     });
     return {
