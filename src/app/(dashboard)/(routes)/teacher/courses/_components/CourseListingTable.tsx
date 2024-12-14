@@ -24,6 +24,14 @@ const CourseListingTable = ({
     creatorId: string;
   }[];
 }) => {
+  if (courses.length === 0) {
+    return (
+      <div className="w-full flex items-center justify-center">
+        <p className="text-xl font-semibold">No Courses Available.</p>
+      </div>
+    );
+  }
+
   return (
     <Table>
       <TableHeader>

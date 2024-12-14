@@ -70,7 +70,7 @@ const CourseImageForm = ({ image }: CourseImageFormType) => {
             );
             if (data.success) {
               toast.toast({
-                description: "Course Updated Succesfully.",
+                description: "Course Updated Successfully.",
               });
             } else {
               toast.toast({

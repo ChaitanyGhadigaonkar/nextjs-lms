@@ -18,6 +18,7 @@ export const CreateCourseAction = async (title: string) => {
     if (isExists) {
       throw new Error("Course Title Already Taken.");
     }
+    console.log(session.user.id);
     const course = await db.course.create({
       data: {
         creatorId: session.user.id,
@@ -44,7 +45,7 @@ export const DeleteCourseAction = async (courseId: string) => {
     if (!session?.user?.email) {
       throw new Error("Session Not Found");
     }
-
+    console.log(session.user.id + "at delete course");
     const deleteCourse = await db.course.delete({
       where: {
         courseId,

@@ -43,6 +43,14 @@ const categoryFormSchema = z.object({
     }
   ),
 });
+type CategoryType =
+  | "accounting"
+  | "computer science"
+  | "engineering"
+  | "filming"
+  | "fitness"
+  | "music"
+  | "photography";
 type CategorySelectionType = {
   category: string | null | undefined;
 };
@@ -56,6 +64,9 @@ const CategorySelection = ({ category }: CategorySelectionType) => {
 
   const form = useForm<z.infer<typeof categoryFormSchema>>({
     resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      category: category ? (category as CategoryType) : "computer science",
+    },
   });
 
   const handleSubmit = (values: z.infer<typeof categoryFormSchema>) => {
@@ -104,7 +115,9 @@ const CategorySelection = ({ category }: CategorySelectionType) => {
       </div>
 
       {!isEditing && (
-        <p className="text-base py-2">{category ? category : "No category"}</p>
+        <p className="text-base py-2 capitalize">
+          {category ? category : "No category"}
+        </p>
       )}
       {isEditing && (
         <Form {...form}>

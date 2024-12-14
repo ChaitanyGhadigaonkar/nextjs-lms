@@ -5,8 +5,6 @@ import bcrypt from "bcrypt";
 
 import db from "@/db/db";
 
-// TODO: Implement Email Password Authentication using Next Js
-
 const authOptions: AuthOptions = {
   providers: [
     Github({
@@ -69,31 +67,32 @@ const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ account, user }) {
-      if (account?.provider === "github") {
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.id = user.id;
+      }
+      if (account && account.provider === "github") {
         const existingUser = await db.user.findUnique({
-          where: { email: user.email! },
+          where: { email: token.email! },
         });
         if (!existingUser) {
-          await db.user.create({
+          const newUser = await db.user.create({
             data: {
-              email: user.email!,
-              name: user.name,
-              image: user.image,
+              email: token.email!,
+              name: token.name!,
+              image: token.picture,
             },
           });
+          token.id = newUser.id;
+        } else {
+          token.id = existingUser.id;
         }
       }
-      return true;
+      return token;
     },
-    async session({ session, user, token }) {
-      if (session?.user) {
-        const userData = await db.user.findFirst({
-          where: {
-            email: user?.email,
-          },
-        });
-        session.user.id = userData?.id as string;
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
       }
       return session;
     },

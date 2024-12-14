@@ -36,7 +36,9 @@ const UserButton = () => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="py-0.5 px-2 text-base font-normal flex gap-1 mx-auto items-center justify-left"
-            onClick={() => signOut()}
+            onClick={async () => {
+              await signOut({ redirect: false });
+            }}
           >
             logout <LogOut className="text-sm" size={"1rem"} />
           </DropdownMenuItem>

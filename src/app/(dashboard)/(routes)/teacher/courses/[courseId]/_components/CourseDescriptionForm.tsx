@@ -37,7 +37,7 @@ const CourseDescriptionForm = ({ description }: CourseDescriptionFormProps) => {
   const form = useForm<z.infer<typeof descriptionFormSchema>>({
     resolver: zodResolver(descriptionFormSchema),
     defaultValues: {
-      description: "",
+      description: description || "",
     },
   });
 
