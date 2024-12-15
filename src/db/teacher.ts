@@ -10,3 +10,11 @@ export const getTeacherCourses = async () => {
     },
   });
 };
+export const getAllChapters = async (courseId: string) => {
+  const session = await getSession();
+  return db.chapter.findMany({
+    where: {
+      courseId: courseId,
+    },
+  });
+};

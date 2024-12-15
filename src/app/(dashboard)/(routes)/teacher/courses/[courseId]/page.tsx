@@ -4,6 +4,7 @@ import db from "@/db/db";
 
 import SectionHeader from "../../_components/SectionHeader";
 import CourseDetailsLeft from "./_components/CourseDetailsLeft";
+import CourseDetailsRight from "./_components/CourseDetailsRight";
 
 const CourseOverViewPage = async ({
   params,
@@ -41,8 +42,9 @@ const CourseOverViewPage = async ({
           <CourseDetailsLeft course={courseDetails} />
         </div>
         {/* right  */}
-        <div className="flex-1">
+        <div className="flex-1 px-2">
           <SectionHeader title="Course Chapters" icon={ListChecks} />
+          <CourseDetailsRight course={courseDetails} />
         </div>
       </div>
     </div>

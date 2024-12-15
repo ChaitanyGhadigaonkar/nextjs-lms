@@ -180,3 +180,30 @@ export const UpdateCourseCategoryAction = async (
     return { success: false, message: "Failed To Create Course." };
   }
 };
+
+// chapters
+
+export const createChapter = async (courseId: string, chapterName: string) => {
+  try {
+    const session = await getSession();
+    if (!session?.user?.email) {
+      throw new Error("Session Not Found");
+    }
+    const chapter = await db.chapter.create({
+      data: {
+        courseId: courseId,
+        title: chapterName,
+      },
+    });
+    return {
+      success: true,
+      data: { chapter },
+      message: "Chapter created Successfully",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Failed To Create Chapter." };
+  }
+};
