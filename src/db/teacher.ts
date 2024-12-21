@@ -16,5 +16,8 @@ export const getAllChapters = async (courseId: string) => {
     where: {
       courseId: courseId,
     },
+    orderBy: {
+      position: "asc",
+    },
   });
 };

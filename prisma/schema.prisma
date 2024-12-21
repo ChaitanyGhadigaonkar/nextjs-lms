@@ -38,6 +38,7 @@ model Chapter {
   title        String      @unique
   description  String?
   isPreview    Boolean     @default(false)
+  position     Int
   video        String?
   courseId     String
   attachmentId String?     @unique

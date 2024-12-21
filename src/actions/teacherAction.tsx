@@ -189,10 +189,16 @@ export const createChapter = async (courseId: string, chapterName: string) => {
     if (!session?.user?.email) {
       throw new Error("Session Not Found");
     }
+    const chapters = await db.chapter.findMany({
+      where: {
+        courseId,
+      },
+    });
     const chapter = await db.chapter.create({
       data: {
         courseId: courseId,
         title: chapterName,
+        position: chapters.length,
       },
     });
     return {

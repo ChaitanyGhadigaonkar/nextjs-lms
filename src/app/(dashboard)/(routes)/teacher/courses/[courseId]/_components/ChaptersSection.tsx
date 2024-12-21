@@ -4,7 +4,7 @@ import { CirclePlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import ChaptersDnd from "./ChaptersDnd";
+import ChaptersDnd from "./DragAndDrop/ChaptersDnd";
 import AddChapterForm from "./AddChapterForm";
 
 interface ChaptersSectionProps {
