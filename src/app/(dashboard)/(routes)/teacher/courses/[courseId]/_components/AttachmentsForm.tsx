@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ImageIcon, Pencil } from "lucide-react";
+import { CirclePlus, ImageIcon, Pencil } from "lucide-react";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,13 @@ import UploadFile from "@/components/UploadFile";
 import { useParams, useRouter } from "next/navigation";
 import { UpdateCourseImageAction } from "@/actions/teacherAction";
 import { useToast } from "@/hooks/use-toast";
+import { Attachment } from "@prisma/client";
 
-type CourseImageFormType = {
+type AttachmentsFormProps = {
   image: string | null | undefined;
+  attachments: Attachment[] | null | undefined;
 };
-const CourseImageForm = ({ image }: CourseImageFormType) => {
+const AttachmentsForm = ({ image }: AttachmentsFormProps) => {
   const router = useRouter();
   const params = useParams();
   const toast = useToast();
@@ -27,7 +29,7 @@ const CourseImageForm = ({ image }: CourseImageFormType) => {
   return (
     <div className="w-full flex flex-col gap-2 bg-blue-50 px-4 py-2 my-2 rounded-md md:gap-4">
       <div className="w-full flex items-center justify-between">
-        <h4 className="text-base font-medium ">Course Image</h4>
+        <h4 className="text-base font-medium ">Course Attachments</h4>
 
         <Button
           variant={"ghost"}
@@ -38,31 +40,26 @@ const CourseImageForm = ({ image }: CourseImageFormType) => {
             <p className="text-sm">Cancel</p>
           ) : (
             <>
-              <Pencil size={16} />
-              <p className="text-sm">Edit image</p>
+              <CirclePlus size={16} />
+              Add an attachment
             </>
           )}
         </Button>
       </div>
 
       {!isEditing && image && (
-        <Image
-          priority={true}
-          className="text-base py-2 w-full h-56 rounded-lg"
-          src={image}
-          width={300}
-          height={250}
-          alt="course image"
-        />
+        <div>
+          <p>No Attachments Yet</p>
+        </div>
       )}
       {!isEditing && !image && (
-        <div className="w-full h-56 rounded-lg bg-gray-200 flex items-center justify-center">
-          <ImageIcon className="w-8 h-8" />
+        <div>
+          <p>No Attachments Yet</p>
         </div>
       )}
       {isEditing && (
         <UploadFile
-          accept="image/*"
+          accept="*"
           setUploadedFileUrl={setImageUrl}
           onFileUpload={async (image) => {
             const data = await UpdateCourseImageAction(
@@ -75,7 +72,7 @@ const CourseImageForm = ({ image }: CourseImageFormType) => {
               });
             } else {
               toast.toast({
-                description: "Failed  To update Course Image",
+                description: "Failed To update Course Image",
               });
             }
             router.refresh();
@@ -87,4 +84,4 @@ const CourseImageForm = ({ image }: CourseImageFormType) => {
   );
 };
 
-export default CourseImageForm;
+export default AttachmentsForm;

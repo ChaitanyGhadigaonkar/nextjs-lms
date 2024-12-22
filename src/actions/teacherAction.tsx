@@ -1,6 +1,7 @@
 "use server";
 import db from "@/db/db";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
+import { Prisma } from "@prisma/client";
 
 export const CreateCourseAction = async (title: string) => {
   try {
@@ -172,6 +173,37 @@ export const UpdateCourseCategoryAction = async (
       success: true,
       data: { updatedCourse },
       message: "Course updated Successfully",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Failed To Create Course." };
+  }
+};
+
+export const UpdateCoursePriceAction = async (
+  courseId: string,
+  price: string
+) => {
+  try {
+    const session = await getSession();
+    if (!session?.user?.email) {
+      throw new Error("Session Not Found");
+    }
+
+    const updatedCourse = await db.course.update({
+      where: {
+        courseId,
+      },
+      data: {
+        price: new Prisma.Decimal(price),
+      },
+    });
+    return {
+      success: true,
+      data: { updatedCourse },
+      message: "Course Updated Successfully",
     };
   } catch (error) {
     if (error instanceof Error) {

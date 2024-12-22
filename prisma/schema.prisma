@@ -34,23 +34,21 @@ model Course {
 }
 
 model Chapter {
-  chapterId    String      @id @default(uuid())
+  chapterId    String  @id @default(uuid())
   title        String
   description  String?
-  isPreview    Boolean     @default(false)
+  isPreview    Boolean @default(false)
   position     Int
   video        String?
   courseId     String
-  attachmentId String?     @unique
-  course       Course      @relation(fields: [courseId], references: [courseId])
-  attachment   Attachment? @relation(fields: [attachmentId], references: [attachmentId])
+  attachmentId String? @unique
+  course       Course  @relation(fields: [courseId], references: [courseId])
 }
 
 model Attachment {
-  attachmentId   String    @id @default(uuid())
-  filename       String
-  courseCourseId String?
-  chapterId      String?
-  Chapter        Chapter[]
-  course         Course?   @relation(fields: [courseCourseId], references: [courseId])
+  attachmentId String  @id @default(uuid())
+  filename     String
+  fileUrl      String
+  courseId     String?
+  course       Course? @relation(fields: [courseId], references: [courseId])
 }

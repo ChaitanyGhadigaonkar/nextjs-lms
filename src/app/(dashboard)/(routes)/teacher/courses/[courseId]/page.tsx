@@ -43,7 +43,6 @@ const CourseOverViewPage = async ({
         </div>
         {/* right  */}
         <div className="flex-1 px-2">
-          <SectionHeader title="Course Chapters" icon={ListChecks} />
           <CourseDetailsRight course={courseDetails} />
         </div>
       </div>
