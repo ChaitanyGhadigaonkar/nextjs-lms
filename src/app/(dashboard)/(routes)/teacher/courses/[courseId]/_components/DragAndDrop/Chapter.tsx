@@ -23,7 +23,7 @@ const ChapterComponent: React.FC<ChapterPropsType> = ({ chapter }) => {
         transition,
         transform: CSS.Transform.toString(transform),
       }}
-      className="border border-slate-300 rounded-sm px-2 py-2 w-full flex justify-between items-center mb-2 shadow-sm"
+      className="border border-slate-300 rounded-sm px-2 py-2 w-full flex justify-between items-center mb-2 shadow-sm touch-none"
     >
       <div className="flex gap-2 items-center">
         <GripVertical className="text-blue-500 w-5 h-5" />

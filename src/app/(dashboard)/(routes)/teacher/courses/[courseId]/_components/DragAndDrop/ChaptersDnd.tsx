@@ -84,7 +84,7 @@ const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
     <div className="relative w-full h-full">
       <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
         {isPending && (
-          <div className="absolute inset-0 w-full h-full bg-sky-100 flex items-center justify-center z-20 rounded-md">
+          <div className="absolute inset-0 w-full h-full bg-sky-500/50 flex items-center justify-center z-20 rounded-md">
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         )}

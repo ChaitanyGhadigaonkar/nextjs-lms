@@ -35,7 +35,7 @@ model Course {
 
 model Chapter {
   chapterId    String      @id @default(uuid())
-  title        String      @unique
+  title        String
   description  String?
   isPreview    Boolean     @default(false)
   position     Int
