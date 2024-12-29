@@ -11,7 +11,7 @@ const AttachmentsSection = ({ course }: AttachmentSectionProps) => {
   return (
     <div className="flex flex-col">
       <SectionHeader title="Attachments" icon={File} />
-      <AttachmentsForm image={course?.image} attachments={[]} />
+      <AttachmentsForm />
     </div>
   );
 };

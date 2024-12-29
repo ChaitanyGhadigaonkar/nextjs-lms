@@ -245,3 +245,41 @@ export const createChapter = async (courseId: string, chapterName: string) => {
     return { success: false, message: "Failed To Create Chapter." };
   }
 };
+
+// attachments
+export const deleteAttachments = async (
+  courseId: string,
+  attachmentId: string
+) => {
+  try {
+    const session = await getSession();
+    if (!session?.user?.email) {
+      throw new Error("Session Not Found");
+    }
+    const isOwn = await db.course.findFirst({
+      where: {
+        courseId,
+        creatorId: session.user.id,
+      },
+    });
+    if (!isOwn) {
+      return { success: false, message: "UnAuthorized." };
+    }
+    const attachment = await db.attachment.delete({
+      where: {
+        courseId: courseId,
+        attachmentId,
+      },
+    });
+    return {
+      success: true,
+      data: { attachment },
+      message: "Attachment deleted Successfully",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "Failed To Delete Attachment." };
+  }
+};

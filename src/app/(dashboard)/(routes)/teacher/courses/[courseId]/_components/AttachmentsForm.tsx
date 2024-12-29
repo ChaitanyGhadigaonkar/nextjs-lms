@@ -1,30 +1,104 @@
 "use client";
-import { useState } from "react";
-import { CirclePlus, ImageIcon, Pencil } from "lucide-react";
-import Image from "next/image";
+import { useEffect, useState, useTransition } from "react";
+import { CirclePlus, ImageIcon, Loader2, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import UploadFile from "@/components/UploadFile";
 import { useParams, useRouter } from "next/navigation";
-import { UpdateCourseImageAction } from "@/actions/teacherAction";
 import { useToast } from "@/hooks/use-toast";
 import { Attachment } from "@prisma/client";
+import { Input } from "@/components/ui/input";
+import { z } from "zod";
+import { Form, FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import AttachmentComponent from "./Attachment";
 
-type AttachmentsFormProps = {
-  image: string | null | undefined;
-  attachments: Attachment[] | null | undefined;
-};
-const AttachmentsForm = ({ image }: AttachmentsFormProps) => {
+const AttachmentsFormSchema = z.object({
+  files: z.array(
+    z
+      .instanceof(File)
+      .refine(
+        (file) => file.size < 2 * 1024 * 1024,
+        "File size must be less than 2MB"
+      )
+  ),
+});
+const AttachmentsForm = () => {
   const router = useRouter();
   const params = useParams();
   const toast = useToast();
-
   const [isEditing, setIsEditing] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [isGetAttachmentsLoading, setIsGetAttachmentsLoading] = useState(false);
+  const [refetchTrigger, setRefetchTrigger] = useState(false);
+
+  const [isPending, setTransition] = useTransition();
+
+  const form = useForm<z.infer<typeof AttachmentsFormSchema>>({
+    resolver: zodResolver(AttachmentsFormSchema),
+    defaultValues: {
+      files: [],
+    },
+  });
+  const { reset } = form;
+
+  const handleSubmit = (values: z.infer<typeof AttachmentsFormSchema>) => {
+    setTransition(async () => {
+      try {
+        // bad way
+        for (let i = 0; i < values.files.length; i++) {
+          const formData = new FormData();
+          formData.append("file", values.files[i]);
+          const response = await fetch(
+            `/api/courses/${params.courseId}/attachments`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+        }
+      } catch (error) {
+        toast.toast({
+          description: "Failed To Upload.",
+        });
+      }
+      router.refresh();
+    });
+  };
 
   const toggleEditing = () => {
     setIsEditing((prev) => !prev);
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsGetAttachmentsLoading(true);
+        const response = await fetch(
+          `/api/courses/${params.courseId}/attachments`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setAttachments(data.attachments);
+        }
+      } catch (error) {
+        setIsGetAttachmentsLoading(false);
+      }
+    })();
+  }, [refetchTrigger]);
+
+  // https://github.com/shadcn-ui/ui/issues/2997
+  useEffect(() => {
+    reset({
+      files: [],
+    });
+  }, [reset]);
 
   return (
     <div className="w-full flex flex-col gap-2 bg-blue-50 px-4 py-2 my-2 rounded-md md:gap-4">
@@ -47,38 +121,58 @@ const AttachmentsForm = ({ image }: AttachmentsFormProps) => {
         </Button>
       </div>
 
-      {!isEditing && image && (
+      {!isEditing && attachments.length === 0 && (
         <div>
           <p>No Attachments Yet</p>
         </div>
       )}
-      {!isEditing && !image && (
-        <div>
-          <p>No Attachments Yet</p>
+      {!isEditing && attachments.length !== 0 && (
+        <div className="w-full flex flex-col gap-2">
+          {attachments.map((attachment) => (
+            <AttachmentComponent
+              attachment={attachment}
+              key={attachment.attachmentId}
+              setRefetchTrigger={setRefetchTrigger}
+            />
+          ))}
         </div>
       )}
       {isEditing && (
-        <UploadFile
-          accept="*"
-          setUploadedFileUrl={setImageUrl}
-          onFileUpload={async (image) => {
-            const data = await UpdateCourseImageAction(
-              params.courseId as string,
-              image
-            );
-            if (data.success) {
-              toast.toast({
-                description: "Course Updated Successfully.",
-              });
-            } else {
-              toast.toast({
-                description: "Failed To update Course Image",
-              });
-            }
-            router.refresh();
-            setIsEditing(false);
-          }}
-        />
+        <FormProvider {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4 py-2"
+          >
+            <FormField
+              control={form.control}
+              name="files"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      multiple
+                      type="file"
+                      {...field}
+                      value={undefined}
+                      onChange={(e) => {
+                        const filesArray = Array.from(e.target.files || []);
+                        field.onChange(filesArray);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "save"
+              )}
+            </Button>
+          </form>
+        </FormProvider>
       )}
     </div>
   );
