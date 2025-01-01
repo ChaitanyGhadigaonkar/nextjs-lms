@@ -35,7 +35,7 @@ const AttachmentsForm = () => {
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [isGetAttachmentsLoading, setIsGetAttachmentsLoading] = useState(false);
+  const [isGetAttachmentsLoading, setIsGetAttachmentsLoading] = useState(true);
   const [refetchTrigger, setRefetchTrigger] = useState(false);
 
   const [isPending, setTransition] = useTransition();
@@ -88,6 +88,7 @@ const AttachmentsForm = () => {
         if (data.success) {
           setAttachments(data.attachments);
         }
+        setIsGetAttachmentsLoading(false);
       } catch (error) {
         setIsGetAttachmentsLoading(false);
       }
@@ -127,7 +128,7 @@ const AttachmentsForm = () => {
           <p>No Attachments Yet</p>
         </div>
       )}
-      {isGetAttachmentsLoading && !isEditing && attachments.length === 0 && (
+      {isGetAttachmentsLoading && !isEditing && (
         <div className="flex flex-col gap-1">
           {[0, 1, 2, 3].map((item) => (
             <AttachmentSkeleton key={item} />
