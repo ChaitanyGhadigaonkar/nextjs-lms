@@ -8,6 +8,7 @@ import Chapters from "./Chapters";
 import { DndChapterType } from "@/main.types";
 import { arrayMove } from "@dnd-kit/sortable";
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ChaptersDndProps {
   courseId: string | undefined;
@@ -15,10 +16,12 @@ interface ChaptersDndProps {
 
 const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
   const [chapters, setChapters] = useState<DndChapterType[]>([]);
+  const [isGetChaptersLoading, setIsGetChaptersLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
 
   const getAllChapters = async () => {
     try {
+      setIsGetChaptersLoading(true);
       const response = await fetch(`/api/chapters/${courseId}`);
       const data = await response.json();
       if (data.success) {
@@ -32,8 +35,10 @@ const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
       } else {
         console.log(data.message);
       }
+      setIsGetChaptersLoading(false);
     } catch (error) {
       console.log(error);
+      setIsGetChaptersLoading(false);
     }
   };
 
@@ -88,14 +93,39 @@ const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         )}
-        {chapters.length === 0 ? (
+        {!isGetChaptersLoading && chapters.length === 0 ? (
           <div className="text-base text-slate-600 font-semibold">
             No Chapters Available
           </div>
         ) : (
-          <Chapters chapters={chapters} />
+          <>
+            {isGetChaptersLoading ? (
+              <div className="flex flex-col gap-2">
+                {[0, 1, 2, 3].map((item) => (
+                  <ChapterSkeleton key={item} />
+                ))}
+              </div>
+            ) : (
+              <Chapters chapters={chapters} />
+            )}
+          </>
         )}
       </DndContext>
+    </div>
+  );
+};
+
+const ChapterSkeleton = () => {
+  return (
+    <div className="flex items-center justify-between space-x-4 px-2 py-0.5">
+      <div className="flex items-center space-x-2">
+        <Skeleton className="h-6 w-6" />
+        <Skeleton className="h-6 w-36" />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Skeleton className="h-6 w-16" />
+        <Skeleton className="h-6 w-16" />
+      </div>
     </div>
   );
 };

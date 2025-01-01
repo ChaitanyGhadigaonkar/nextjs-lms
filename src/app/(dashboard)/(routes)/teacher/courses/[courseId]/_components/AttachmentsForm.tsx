@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import AttachmentComponent from "./Attachment";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AttachmentsFormSchema = z.object({
   files: z.array(
@@ -121,9 +122,16 @@ const AttachmentsForm = () => {
         </Button>
       </div>
 
-      {!isEditing && attachments.length === 0 && (
+      {!isGetAttachmentsLoading && !isEditing && attachments.length === 0 && (
         <div>
           <p>No Attachments Yet</p>
+        </div>
+      )}
+      {isGetAttachmentsLoading && !isEditing && attachments.length === 0 && (
+        <div className="flex flex-col gap-1">
+          {[0, 1, 2, 3].map((item) => (
+            <AttachmentSkeleton key={item} />
+          ))}
         </div>
       )}
       {!isEditing && attachments.length !== 0 && (
@@ -174,6 +182,20 @@ const AttachmentsForm = () => {
           </form>
         </FormProvider>
       )}
+    </div>
+  );
+};
+
+const AttachmentSkeleton = () => {
+  return (
+    <div className="flex items-center justify-between space-x-4 px-2 py-0.5">
+      <div className="flex items-center space-x-2">
+        <Skeleton className="h-6 w-6" />
+        <Skeleton className="h-6 w-36" />
+      </div>
+      <div className="">
+        <Skeleton className="h-6 w-6" />
+      </div>
     </div>
   );
 };
