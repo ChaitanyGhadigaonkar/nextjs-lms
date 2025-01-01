@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/db/db";
 import { getSession } from "@/app/api/auth/[...nextauth]/auth";
 import configureCloudinary from "@/lib/cloudinaryConfig";
-import { upload } from "@/app/api/upload/route";
+import { upload } from "@/lib/upload";
 
 export async function POST(
   req: NextRequest,
