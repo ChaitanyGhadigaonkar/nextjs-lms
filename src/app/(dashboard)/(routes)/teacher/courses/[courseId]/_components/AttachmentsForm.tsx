@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Attachment } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import {FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FormControl,
@@ -20,14 +20,16 @@ import AttachmentComponent from "./Attachment";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const AttachmentsFormSchema = z.object({
-  files: z.array(
-    z
-      .instanceof(File)
-      .refine(
-        (file) => file.size < 2 * 1024 * 1024,
-        "File size must be less than 2MB"
-      )
-  ),
+  files: z
+    .array(
+      z
+        .instanceof(File)
+        .refine(
+          (file) => file.size < 2 * 1024 * 1024,
+          "File size must be less than 2MB"
+        )
+    )
+    .min(1, "At least one file is required"),
 });
 const AttachmentsForm = () => {
   const router = useRouter();
@@ -36,7 +38,6 @@ const AttachmentsForm = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isGetAttachmentsLoading, setIsGetAttachmentsLoading] = useState(true);
-  const [refetchTrigger, setRefetchTrigger] = useState(false);
 
   const [isPending, setTransition] = useTransition();
 
@@ -64,36 +65,41 @@ const AttachmentsForm = () => {
           );
           const data = await response.json();
         }
+        toast.toast({ description: "File Uploaded Successfully." });
+        await fetchAttachments();
+        toggleEditing();
       } catch (error) {
         toast.toast({
           description: "Failed To Upload.",
         });
       }
-      router.refresh();
     });
+    form.reset();
   };
 
   const toggleEditing = () => {
     setIsEditing((prev) => !prev);
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsGetAttachmentsLoading(true);
-        const response = await fetch(
-          `/api/courses/${params.courseId}/attachments`
-        );
-        const data = await response.json();
-        if (data.success) {
-          setAttachments(data.attachments);
-        }
-        setIsGetAttachmentsLoading(false);
-      } catch (error) {
-        setIsGetAttachmentsLoading(false);
+  const fetchAttachments = async () => {
+    try {
+      setIsGetAttachmentsLoading(true);
+      const response = await fetch(
+        `/api/courses/${params.courseId}/attachments`
+      );
+      const data = await response.json();
+      if (data.success) {
+        setAttachments(data.attachments);
       }
-    })();
-  }, [refetchTrigger]);
+      setIsGetAttachmentsLoading(false);
+    } catch (error) {
+      setIsGetAttachmentsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAttachments();
+  }, []);
 
   // https://github.com/shadcn-ui/ui/issues/2997
   useEffect(() => {
@@ -135,13 +141,13 @@ const AttachmentsForm = () => {
           ))}
         </div>
       )}
-      {!isEditing && attachments.length !== 0 && (
+      {!isGetAttachmentsLoading && !isEditing && attachments.length !== 0 && (
         <div className="w-full flex flex-col gap-2">
           {attachments.map((attachment) => (
             <AttachmentComponent
               attachment={attachment}
               key={attachment.attachmentId}
-              setRefetchTrigger={setRefetchTrigger}
+              fetchAttachments={fetchAttachments}
             />
           ))}
         </div>

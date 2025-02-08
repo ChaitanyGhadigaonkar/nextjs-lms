@@ -10,12 +10,12 @@ import { SetStateAction, Dispatch } from "react";
 
 interface AttachmentProps {
   attachment: Attachment;
-  setRefetchTrigger: Dispatch<SetStateAction<boolean>>;
+  fetchAttachments: () => Promise<void>;
 }
 
 const AttachmentComponent = ({
   attachment,
-  setRefetchTrigger,
+  fetchAttachments,
 }: AttachmentProps) => {
   const params = useParams();
   const toast = useToast();
@@ -44,10 +44,10 @@ const AttachmentComponent = ({
           );
           if (result.success) {
             toast.toast({ description: "Attachment Deleted Successfully" });
+            await fetchAttachments();
           } else {
             toast.toast({ description: "Failed To Delete Attachment." });
           }
-          setRefetchTrigger(true);
         }}
       >
         <X size={"1rem"} />
