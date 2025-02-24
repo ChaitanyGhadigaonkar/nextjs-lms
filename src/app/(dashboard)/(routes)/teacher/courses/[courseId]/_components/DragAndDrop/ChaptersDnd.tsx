@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import { Chapter } from "@prisma/client";
 
-import { closestCorners, DndContext, DragEndEvent } from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  MouseSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import Chapters from "./Chapters";
 import { DndChapterType } from "@/main.types";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -18,6 +28,22 @@ const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
   const [chapters, setChapters] = useState<DndChapterType[]>([]);
   const [isGetChaptersLoading, setIsGetChaptersLoading] = useState(true);
   const [isPending, setIsPending] = useState(false);
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 0.01,
+    },
+  });
+  const mouseSensor = useSensor(MouseSensor);
+  const touchSensor = useSensor(TouchSensor);
+  const keyboardSensor = useSensor(KeyboardSensor);
+
+  const sensors = useSensors(
+    mouseSensor,
+    touchSensor,
+    keyboardSensor,
+    pointerSensor
+  );
 
   const getAllChapters = async () => {
     try {
@@ -87,7 +113,11 @@ const ChaptersDnd = ({ courseId }: ChaptersDndProps) => {
 
   return (
     <div className="relative w-full h-full">
-      <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+      <DndContext
+        onDragEnd={handleDragEnd}
+        collisionDetection={closestCorners}
+        sensors={sensors}
+      >
         {isPending && (
           <div className="absolute inset-0 w-full h-full bg-sky-500/50 flex items-center justify-center z-20 rounded-md">
             <Loader2 className="w-6 h-6 animate-spin" />

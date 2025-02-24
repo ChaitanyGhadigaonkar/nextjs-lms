@@ -2,8 +2,10 @@ import React from "react";
 import { DndChapterType } from "@/main.types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from "next/navigation";
 
 interface ChapterPropsType {
   chapter: DndChapterType;
@@ -13,6 +15,8 @@ const ChapterComponent: React.FC<ChapterPropsType> = ({ chapter }) => {
     useSortable({
       id: chapter.id,
     });
+  const params = useParams();
+  const router = useRouter();
 
   return (
     <div
@@ -32,6 +36,18 @@ const ChapterComponent: React.FC<ChapterPropsType> = ({ chapter }) => {
       <div className="flex gap-1">
         <Badge>Free</Badge>
         <Badge className="bg-blue-600 hover:bg-blue-500">UnPublished</Badge>
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          className="size-5 flex items-center justify-center text-sky-600 hover:text-sky-500"
+          onClick={(e) => {
+            router.push(
+              `/teacher/courses/${params.courseId}/chapters/${chapter.chapterId}`
+            );
+          }}
+        >
+          <Pencil />
+        </Button>
       </div>
     </div>
   );
